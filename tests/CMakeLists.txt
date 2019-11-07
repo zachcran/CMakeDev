@@ -1,19 +1,18 @@
-list(
-    APPEND
-    CMAKE_MODULE_PATH
-    "/home/ryan/CLionProjects/CMakeTest"
-    "${PROJECT_SOURCE_DIR}"
+# List of our unit tests
+set(unit_tests subtract_time timer)
+
+# ---------------- Shouldn't need to change anything below here ----------------
+
+# Get and install CMakeTest
+include(FetchContent)
+FetchContent_Declare(
+    cmake_test
+    GIT_REPOSITORY https://github.com/CMakePP/CMakeTest
+    GIT_TAG install
 )
-string(REGEX REPLACE ";" "\\\;" test_path "${CMAKE_MODULE_PATH}")
-function(add_cmake_test)
-    foreach(testi ${ARGN})
-        set(full_path ${CMAKE_CURRENT_LIST_DIR}/${testi}.cmake)
-        add_test(
-            NAME "${testi}"
-            COMMAND ${CMAKE_COMMAND}
-            -DCMAKE_MODULE_PATH=${test_path}
-            -P ${full_path}
-        )
-    endforeach()
-endfunction()
-add_cmake_test("subtract_time" "timer")
+FetchContent_MakeAvailable(cmake_test)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR} "${cmake_test_SOURCE_DIR}")
+
+include(cmake_test/cmake_test)
+add_cmake_unit_tests("${CMAKE_MODULE_PATH}" ${unit_tests})
+

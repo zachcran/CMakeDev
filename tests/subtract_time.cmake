@@ -1,4 +1,3 @@
-message("${CMAKE_MODULE_PATH}")
 include(cmake_test/cmake_test)
 ct_add_test("subtract_time")
     include(timer/subtract_time)
