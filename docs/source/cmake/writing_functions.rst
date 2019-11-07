@@ -64,3 +64,56 @@ use a per module prefix. For example, in the CMakeTest repository we use the
 prefix ``ct_``. While not foolproof, when combined with type checking, this
 strategy should avoid many collisions, and raise errors for most of the
 remaining such collisions.
+
+Variable Collisions
+===================
+
+Even though functions create scope you have to be careful when your functions
+take identifiers. Consider this somewhat contrived example:
+
+.. code-block:: cmake
+
+   # Sets the identifier to 3
+   function(return_3 result)
+       set(${result} 3 PARENT_SCOPE)
+   endfunction()
+
+   # Sets the identifier to 32
+   function(return_32 input)
+       set(result 2)
+       return_3(${input})
+       set(${input} "${${input}}${result}" PARENT_SCOPE)
+   endfunction()
+
+   return_32(var)
+   message("Contents: ${var}")  # prints "32"
+   return_32(result)
+   message("Contents: ${result}")  # prints "33"
+
+We define two functions. The first one takes an identifier and sets its value to
+3. The second one's intent is to set an identifier to the value 324 in a
+somewhat convoluted manner by:
+
+1. Setting a temporary variable ``result`` to 2,
+2. having the ``return_3`` set the provided identifier to 3, and
+3. finally concatenates the identifier's value with the temporary's value.
+
+As long as the caller of ``return_32`` doesn't pass in an identifier named
+``result``, ``return_32`` works correctly. If the caller does decide to call
+their identifier ``result``, then the call to ``return_3`` in ``return_32``
+overwrites the temporary of the same name so that the result of ``return_32`` is
+actually ``33``.
+
+While this example may seem contrived, one of the dangers of having to pass an
+identifier in to a function in order to get a return is that if that identifier
+clashes with any temporaries they get overridden. Particularly for common,
+simple variable names (like ``result``) the caller picking an identifier
+identical to your temporary happens more often than you might think (especially
+when the same programmer wrote all the functions on the stack). To mitigate
+this, it's common to prefix function variable names with ``_`` characters, the
+idea being that users writing CMake are unlikely to declare variable names that
+start with such characters. The problem is that in a framework like CMakePP we
+end up nesting so many developer functions it's actually quite likely for the
+underscore prefixed names to clash too. Our solution is to mangle the name of
+the function into the variable as well. While not foolproof it does help.
+
