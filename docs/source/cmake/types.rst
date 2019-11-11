@@ -156,8 +156,8 @@ will call ``a_fxn`` with a call that looks like
 There are many gotchas associated with CMake's native lists, the most common one
 is the fact that CMake does not support nested lists without some difficulty. In
 particular this comes into play when you pass lists to native CMake functions
-which accept their arguments via keywords. Such functions are essentially
-defined akin to:
+which accept their arguments via variadic arguments (most notably as keywords).
+Keyword accepting functions are essentially defined akin to:
 
 .. code-block:: cmake
 

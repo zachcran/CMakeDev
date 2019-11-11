@@ -75,7 +75,7 @@ tuple, so the correct documentation for a multiple-return value function is:
       """ Function which returns multiple values.
 
       :return: Two of the most overused values in documentation.
-      :rtype: (int, str)
+      :rtype: tuple(int, str)
       """
 
       return 42, 'Hello World'
