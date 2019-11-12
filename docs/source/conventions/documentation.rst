@@ -99,8 +99,20 @@ CMake
 -----
 
 CMake documentation uses the ``CMakeDoc`` tool developed by the CMakePP project.
-Conventions for documenting CMake code are forthcoming once ``CMakeDoc`` is
-further along.
+This tool looks for specially prefixed CMake comments (line comments that start
+with ``##`` and block comments that start with ``#[[[``) and extracts the
+contents verbatim as documentation of the API/variable that the comment
+immediately proceeds. The contents of the comment are assumed to be reST and it
+is assumed that the documentation will be built using Sphinx. Therefore, we
+adopt the same reST standards as we do for Python with the following exceptions.
+
+Whereas global variables are frowned upon in Python they are unfortunately
+somewhat common in CMake. To document the global variables your function uses
+the syntax is:
+
+.. code-block:: rst
+
+   :var GLOBAL_VARIABLE: Description of global variable
 
 Narrative Documentation
 =======================
