@@ -10,5 +10,6 @@ this part are designed to familiarize you with these nuances.
 .. toctree::
    :maxdepth: 2
 
-   types
+   if_statements
    writing_functions
+   callbacks
