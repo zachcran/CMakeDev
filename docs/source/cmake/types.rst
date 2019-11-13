@@ -39,11 +39,13 @@ single string. We'll cover lists below.
 Booleans
 ========
 
-In CMake the literal strings ``ON``, ``YES``, ``TRUE``, ``Y``, or a non-zero
-number have special interpretations as also being boolean objects with a true
-value, whereas the literals ``OFF``, ``NO``, ``FALSE``, ``N``, ``0``,
-``IGNORE``, ``NOTFOUND``, and any string that ends in ``-NOTFOUND`` have special
-interpretations as being boolean objects with false values.
+In CMake the literal strings ``ON``, ``YES``, ``TRUE``, and ``Y`` have special
+interpretations as being boolean objects with a true value, whereas the literals
+``OFF``, ``NO``, ``FALSE``, ``N``, and ``NOTFOUND`` have special interpretations
+as being boolean objects with false values. CMake also considers any non-zero
+number to be true and zero to be false; however, such literals are better
+characterized as integers, which can be converted to booleans, than outright
+booleans.
 
 Numbers
 =======

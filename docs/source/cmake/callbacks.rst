@@ -269,6 +269,11 @@ introducing one nested scope on all calls, thus we can return variables like:
    eval("set(x \"hello world\")")
    message("x == ${x}")  # Will print "x == hello world"
 
+A major disadvantage of this pattern (both CMake++ and our optimized form) is
+that it requires the code to be run to be a string. As shown in the code
+examples this means that special characters, like ``"`` and ``;``, will need
+escaped, which is error-prone and tedious.
+
 Visitor Pattern
 ===============
 
