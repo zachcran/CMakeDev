@@ -43,7 +43,10 @@ Evaluating Conditions
 ---------------------
 
 "if" statements were written early in CMake's lifetime, before ``${}`` was
-introduced. Consequentially, it was decided that the "if" statement
+introduced and therefore have somewhat obscure semantics.  This subsection goes
+through those semantics.
+
+Since ``${}`` was not invented yet, it was decided that the "if" statement
 automatically dereferences its argument, unless that argument is a recognized
 boolean. In other words:
 
@@ -64,12 +67,28 @@ boolean. In other words:
        message("The else clause")
    endif()
 
-will print "The if clause" once and then "The else clause" twice. This is
-because the first "if" statement checks that ``y`` has a non-false value, which
-it does (its value is ``"x"``). The second statement checks that ``x`` has a
-non-false value, which it does not (its value is ``FALSE``). In other words, the
-second statement is **NOT** checking whether or not ``x`` is defined, but rather
-if ``${x}`` is true.
+will print "The if clause" and then the "The else clause". This is because the
+first "if" statement checks that ``y`` has a non-false value, which it does
+(its value is ``"x"``). The second statement checks that ``x`` has a non-false
+value, which it does not (its value is ``FALSE``). In other words, the second
+statement is **NOT** checking whether or not ``x`` is defined, but rather if
+``${x}`` is true. The only time the variable does not get dereferenced is if it
+is a recognized CMake boolean literal (you should never name your variables this
+way...):
+
+.. code-block:: cmake
+
+   set(TRUE FALSE)
+
+   if(TRUE)
+       message("The if clause")
+   else()
+       message("The else clause")
+   endif()
+
+will trip the if-clause because CMake will not dereference the variable
+``TRUE``.
+
 
 Wrapping "if" Statements
 ------------------------

@@ -40,6 +40,57 @@ the function because the macro's manipulations are contained within the
 function's scope. Generally speaking, if you use a macro instead of a function
 it is a good idea to explain why in the documentation.
 
+Returning Values
+================
+
+Unfortunately, CMake does not allow functions or macros to return values in the
+traditional sense, that is to say the following is not valid CMake:
+
+.. code-block:: cmake
+
+   result = a_fxn(an_argument)
+
+The only way to return values from a CMake function/macro is to set the value in
+the parent scope (for functions; for macros all values are already accessible
+from outside the macro). Historically this has been done by standardizing names.
+For example, many of the older ``FindXXX.cmake`` modules return their values by
+setting variables like ``XXX_INCLUDE_DIRS`` and the like. This is considered bad
+practice now and should be avoided. The modern way to return values is to ask
+the caller for an identifier and then use that identifier to return the result.
+For example:
+
+.. code-block:: cmake
+
+   function(say_hello identifier_to_use)
+       set("${identifier_to_use}" "Hello World" PARENT_SCOPE)
+   end_function()
+
+   say_hello(result)
+   message("Value returned : ${result}")  # Will be "Hello World"
+
+This pattern allows the caller to specify the variable to use and avoids the
+callee accidentally overwriting state in the caller's scope (a somewhat common
+problem of older, poorly written ``FindXXX.cmake`` modules which have a tendency
+to clobber variables like ``CMAKE_CXX_FLAGS``).
+
+For functions with multiple return points the above pattern becomes:
+
+.. code-block:: cmake
+
+   function(say_hello result who_to_say_hi_to)
+       if("${who_to_say_hi_to}" STREQUAL "Bill")
+           set("${result}" "I guess I will say hello to Bill" PARENT_SCOPE)
+           return()
+       endif()
+       set("${result}" "Hello World" PARENT_SCOPE)
+   endfunction()
+
+Of note you need to include the ``return()`` command which returns control to
+the caller (otherwise control will continue after the "if"-statement). These
+scenarios occur often enough that CMakePP includes the ``cpp_return`` function
+which if called like: ``cpp_return(identifier)`` will set ``identifier`` in the
+parent scope to the value ``${identifier}`` and return control to the caller.
+
 Namespace Collisions
 ====================
 
