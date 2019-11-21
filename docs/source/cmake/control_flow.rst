@@ -160,3 +160,43 @@ bracket arguments, for example:
 .. code-block:: cmake
 
    print_if_true("[[1;2;3]];STREQUAL;[[1;2;3]]" "lists are equal")
+
+Foreach Statements
+==================
+
+For looping in CMake one typically uses the ``foreach`` statement. This
+statement works great if you need to loop over the elements in a CMake list. In
+such cases looping is as simple as:
+
+.. code-block:: cmake
+
+   foreach(elem ${my_list})
+      # Do stuff with element
+   endforeach()
+
+However, other looping modes are not so straightforward.
+
+Iterating Over Ranges
+---------------------
+
+To iterate over a range one needs the starting value, the ending value, and the
+increment (we ignore the increment for this section). When indexing starts at 0
+it is common to specify ranges as half-open like :math:`[0, n)`, where :math:`n`
+is the number of elements in the range, but :math:`n` is not in the range
+itself. Indexing in CMake also starts at 0; however, CMake's ``foreach``
+statements require you to specify closed ranges. As a closed range,
+:math:`[0, n)` is :math:`[0, n-1]`, thus we need to provide ``foreach`` with
+:math:`n-1`. In most languages this would amount to two extra key strokes (or
+four with some padding spaces); however, in CMake we can not do the arithmetic
+in-place (*i.e.* ``foreach(i RANGE n-1)`` is not valid). The result is that in
+CMake one typically iterates over a range using boilerplate like:
+
+.. code-block:: cmake
+
+   math(EXPR last_index "<number_of_elements_in_range> - 1")
+   foreach(index RANGE "${last_index}")
+       list(GET element <list> "${index}")  # (or whatever gets index-th value)
+       # Do stuff
+   endforeach()
+
+

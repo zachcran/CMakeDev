@@ -310,3 +310,7 @@ If we think of the CMake module as an object and the function in the module as a
 method, this pattern looks a lot like the visitor pattern (one could argue it is
 actually duck typing, since the visitor pattern usually has a common base class,
 but oh well).
+
+Template Pattern
+================
+
