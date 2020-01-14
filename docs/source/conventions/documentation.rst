@@ -12,7 +12,7 @@ reST primer to be of use.
 .. note::
 
    I presume there's actually a real computer science term for "narrative
-   documentation"; however, my Googl-ing did not manage to find it so I'm using
+   documentation"; however, my Google-ing did not manage to find it so I'm using
    "narrative documentation" as a placeholder for it. If you know the real term
    please open an issue on the CMakeDev repo so that the documentation can be
    updated.
@@ -32,20 +32,21 @@ conventions for documenting APIs in each of those languages in detail.
 Python
 ------
 
-Documenting Python code is done following the usual reST standards laid out in
+Python has community accepted standards for documentation. Those standards are
+available in the
 `Python's developer guide <https://devguide.python.org/documenting/>`_. The main
 points are:
 
 - No more than 80 characters on a line
 - Indents are 3 spaces, not 4, and not tabs
+- Comments use restructured text (reST)
 
-Function APIs
-^^^^^^^^^^^^^
+The standard does not however strictly specify the contents of the documentation
+or the format of the comments. At the moment, Sphinx is the *de facto* tool for
+creating Python documentation from comments and we thus choose to follow
+`Sphinx's standards <http://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#python-signatures>`_.
 
-Documenting a Python function's API includes documenting the positional
-parameters, variadic arguments, kwargs, and returns. We follow
-`Sphinx's built-in style <http://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#python-signatures>`_.
-To summarize this style, the positional arguments are documented like:
+To summarize this style, positional arguments are documented like:
 
 .. code-block:: rst
 
@@ -81,7 +82,7 @@ tuple, so the correct documentation for a multiple-return value function is:
       return 42, 'Hello World'
 
 I have not been able to find a standardized way of documenting kwargs; however,
-one hack I've come across that produces something that looks like the other
+one "hack" I've come across that produces something that looks like the other
 aspects of the function's API is:
 
 .. code-block:: rst
@@ -113,6 +114,7 @@ the syntax is:
 .. code-block:: rst
 
    :var GLOBAL_VARIABLE: Description of global variable
+   :vartype GLOBAL_VARIABLE: type of the value stored in the global variable
 
 Narrative Documentation
 =======================
@@ -121,8 +123,8 @@ Narrative documentation is like the page you are currently reading. It is only
 loosely tied to a particular piece of code. Narrative documentation is meant for
 providing overviews, background information, implementation details, etc.
 Narrative documentation is built with Sphinx and is written using
-Sphinx-flavored reStructuredText. Consequentially many of the reST conventions
-from the API Documentation section carry over.
+Sphinx-flavored reST. Consequentially many of the reST conventions from the API
+Documentation section carry over.
 
 Compared to writing reST API documentation the biggest difference when writing
 narrative documentation is that narrative documentation is typically partitioned
@@ -148,4 +150,4 @@ but the general idea is that as you nest titles you rotate through the various
 characters. Typically what this means is that you'll use ``#`` for titles on
 ``index.rst`` pages, ``*`` for titles of pages included from ``index.rst``
 pages, and ``=``, ``-``, and ``^`` respectively for sections, subsections, and
-subsections in the page included from the ``index.rst`` file.
+subsubsections in the page included from the ``index.rst`` file.

@@ -133,6 +133,8 @@ from a variable, in other words the following is **NOT** valid CMake:
        ${fxn_contents}
    endfunction()
 
+
+
 Dispatch
 ========
 
@@ -173,9 +175,10 @@ Initializer Function Pattern
 ============================
 
 I first saw this named pattern in the
-`CMake++ <https://github.com/toeb/cmakepp>`_ library. The pattern works by
-assuming we have the contents of the function we want to call in a string. Then
-we define a function ``eval`` like:
+`CMake++ <https://github.com/toeb/cmakepp>`_ library. The essence of this
+pattern is that we generate an implementation file on-the-fly, and then include
+that file run the contents. In CMake++ the pattern works by assuming we have the
+code we want to call in a string. CMake++ then defines a function ``eval`` like:
 
 .. code-block:: cmake
 
@@ -199,46 +202,46 @@ we define a function ``eval`` like:
 
    eval("message(\"hello world\")")
 
-The pattern works by:
-
-1. User calls ``eval`` with the contents they want to run.
-
-   - Call to ``eval`` happens in scope ``A``
-   - Inside ``eval`` is scope ``A::B``
-
-2. ``A::eval`` writes a second version of ``eval`` to a temporary file.
-3. ``A::eval`` includes the temporary file
-
-   - Including file runs it, defining a new version of ``eval`` in scope
-     ``A::B``
-
-4. ``A::eval`` runs ``A::B::eval``
-
-   - Scope inside ``A::B::eval`` is ``A::B::C``
-
-5. ``A::B::eval`` writes the contents to a temporary file
-
-   - Use the same temporary file because we don't need the original anymore
-
-6. ``A::B::eval`` includes the new temporary file
-7. The user's contents run in scope ``A::B::C``
-
-   - Means ``set(... PARENT_SCOPE)`` only returns to scope ``A::B``
-
 .. note::
 
-   If you do not nest the file writes in ``eval`` then:
+   This code is actually quite dense, this note provides a breakdown of how it
+   works.
 
-      .. code-block:: cmake
+   1. User calls ``eval`` with the contents they want to run.
 
-         eval("message(\"hello world\")")
-         eval("message(\"42\")")
+      - Call to ``eval`` happens in scope ``A``
+      - Inside ``eval`` is scope ``A::B``
+
+   2. ``A::eval`` writes a second version of ``eval`` to a temporary file.
+   3. ``A::eval`` includes the temporary file
+
+      - Including file runs it, defining a new version of ``eval`` in scope
+        ``A::B``
+
+   4. ``A::eval`` runs ``A::B::eval``
+
+      - Scope inside ``A::B::eval`` is ``A::B::C``
+
+   5. ``A::B::eval`` writes the contents to a temporary file
+
+      - Use the same temporary file because we don't need the original anymore
+
+   6. ``A::B::eval`` includes the new temporary file
+   7. The user's contents run in scope ``A::B::C``
+
+      - Means ``set(... PARENT_SCOPE)`` only returns to scope ``A::B``
+
+   You may be curious what happens if you do not nest the file writes in
+   ``eval``. If you do not nest the file writes then only first call will work.
+   For example, without nesting the file writes:
+
+   .. code-block:: cmake
+
+      eval("message(\"hello world\")")
+      eval("message(\"42\")")
 
    will print ``"hello world"`` twice. This is because ``A::B::eval``'s
-   definition actually replaces ``A::eval``. This also means that technically
-   ``eval("message(\"42\")")`` is calling ``A::B::eval`` and not ``A::eval``
-   suggesting that we can obtain the same result by forgoing ``A::eval``
-   entirely (*vide infra*).
+   definition actually replaces ``A::eval``.
 
 This pattern is expensive in terms of computational resources as it involves two
 file reads and two file writes. It also requires special attention if it is
@@ -247,9 +250,7 @@ each other's temporary files. As written the first call to ``eval`` can not
 return variables (subsequent calls can) since the content is actually run two
 scopes down.
 
-As alluded to in the proceeding note, it is possible to rewrite the initializer
-function pattern using the definition of the inner ``eval``. The result is much
-simpler:
+It is possible to simplify the above implementation:
 
 .. code-block:: cmake
 
@@ -269,9 +270,9 @@ introducing one nested scope on all calls, thus we can return variables like:
    eval("set(x \"hello world\")")
    message("x == ${x}")  # Will print "x == hello world"
 
-A major disadvantage of this pattern (both CMake++ and our optimized form) is
-that it requires the code to be run to be a string. As shown in the code
-examples this means that special characters, like ``"`` and ``;``, will need
+A major disadvantage of the ``eval`` calls (both CMake++ and our optimized form)
+is that the code to run has to be provided as a string. As shown in the code
+examples, this means that special characters, like ``"`` and ``;``, will need
 escaped, which is error-prone and tedious.
 
 Visitor Pattern
@@ -310,7 +311,3 @@ If we think of the CMake module as an object and the function in the module as a
 method, this pattern looks a lot like the visitor pattern (one could argue it is
 actually duck typing, since the visitor pattern usually has a common base class,
 but oh well).
-
-Template Pattern
-================
-

@@ -14,3 +14,4 @@ CMake best-practices to avoid them.
    control_flow
    writing_functions
    callbacks
+   best_practices

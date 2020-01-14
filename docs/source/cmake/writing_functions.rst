@@ -167,4 +167,3 @@ start with such characters. The problem is that in a framework like CMakePP we
 end up nesting so many developer functions it's actually quite likely for the
 underscore prefixed names to clash too. Our solution is to mangle the name of
 the function into the variable as well. While not foolproof it does help.
-
