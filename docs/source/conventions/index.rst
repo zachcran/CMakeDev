@@ -9,4 +9,5 @@ logic behind them. The chapters attempt to shed light on that logic as well.
 .. toctree::
    :maxdepth: 2
 
+   code_conventions
    documentation
